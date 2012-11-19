@@ -1,0 +1,132 @@
+<html>
+<head><title>Sierpinski Curves</title></head>
+<script type="text/javascript">
+function Ctxt(canvas, x, y, unit) {
+    this.x = x;
+    this.y = y;
+    this.c = canvas;
+    this.c.moveTo(x, y);
+    this.u = unit;
+
+    this.lineUp = function() {
+        this.y = this.y - 2 * this.u;
+        this.draw();
+    }
+
+    this.lineUpLeft = function() {
+        this.x = this.x - this.u;
+        this.y = this.y - this.u;
+        this.draw();
+    }
+
+    this.lineUpRight = function() {
+        this.x = this.x + this.u;
+        this.y = this.y - this.u;
+        this.draw();
+    }
+
+    this.lineRight = function() {
+        this.x = this.x + 2 * this.u;
+        this.draw();
+    }
+
+    this.lineDown = function() {
+        this.y = this.y + 2 * this.u;
+        this.draw();
+    }
+
+    this.lineDownLeft = function() {
+        this.x = this.x - this.u;
+        this.y = this.y + this.u;
+        this.draw();
+    }
+
+    this.lineDownRight = function() {
+        this.x = this.x + this.u;
+        this.y = this.y + this.u;
+        this.draw();
+    }
+
+    this.lineLeft = function() {
+        this.x = this.x - 2 * this.u;
+        this.draw();
+    }
+
+    this.draw = function() {
+        this.c.lineTo(this.x, this.y);
+        this.c.stroke();
+    }
+}
+
+function A(ctxt, i) {
+    if (i == 0)
+        return;
+
+    A(ctxt, i - 1); ctxt.lineDownRight();
+    B(ctxt, i - 1); ctxt.lineRight();
+    D(ctxt, i - 1); ctxt.lineUpRight();
+    A(ctxt, i - 1); 
+}
+
+function B(ctxt, i) {
+    if (i == 0)
+        return;
+
+    B(ctxt, i - 1); ctxt.lineDownLeft();
+    C(ctxt, i - 1); ctxt.lineDown();
+    A(ctxt, i - 1); ctxt.lineDownRight();
+    B(ctxt, i - 1);
+}
+
+function C(ctxt, i) {
+    if (i == 0)
+        return;
+
+    C(ctxt, i - 1); ctxt.lineUpLeft();
+    D(ctxt, i - 1); ctxt.lineLeft();
+    B(ctxt, i - 1); ctxt.lineDownLeft();
+    C(ctxt, i - 1);
+}
+
+function D(ctxt, i) {
+    if (i == 0)
+        return;
+
+    D(ctxt, i - 1); ctxt.lineUpRight();
+    A(ctxt, i - 1); ctxt.lineUp();
+    C(ctxt, i - 1); ctxt.lineUpLeft();
+    D(ctxt, i - 1);
+}
+
+function draw() {
+    var e = document.getElementById("S");
+    var c = e.getContext("2d");
+
+    c.strokeStyle = "darkGrey";
+    c.strokeRect(0, 0, e.width, e.height);
+    c.strokeStyle = "black";
+
+    var u = e.height / 4;
+    var x = e.width / 2;
+    var y = e.height / 2 - u;
+
+    for (var i = 1; i < 6; ++i) {
+        x = x - u;
+        u = u / 2;
+        y = y - u;
+
+        c.beginPath();
+        var ctxt = new Ctxt(c, x, y, u);
+        A(ctxt, i); ctxt.lineDownRight();
+        B(ctxt, i); ctxt.lineDownLeft();
+        C(ctxt, i); ctxt.lineUpLeft();
+        D(ctxt, i); ctxt.lineUpRight();
+        c.closePath();
+    }
+}
+</script>
+
+<body onload="draw()">
+    <canvas id="S" width="1024" height="1024"></canvas>
+</body>
+</html>

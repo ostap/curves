@@ -1,0 +1,156 @@
+<html>
+<head><title>W-Curves</title></head>
+<script type="text/javascript">
+function Ctxt(canvas, x, y, unit) {
+    this.x = x;
+    this.y = y;
+    this.c = canvas;
+    this.c.moveTo(x, y);
+    this.u = unit;
+
+    this.lineUp = function() {
+        this.y = this.y - this.u;
+        this.draw();
+    }
+
+    this.lineRight = function() {
+        this.x = this.x + this.u;
+        this.draw();
+    }
+
+    this.lineDown = function() {
+        this.y = this.y + this.u;
+        this.draw();
+    }
+
+    this.lineLeft = function() {
+        this.x = this.x - this.u;
+        this.draw();
+    }
+
+    this.draw = function() {
+        this.c.lineTo(this.x, this.y);
+        this.c.stroke();
+    }
+}
+
+function W1(ctxt, i) {
+    if (i == 0)
+        return;
+
+    ctxt.lineDown();
+    ctxt.lineRight();
+}
+
+function W2(ctxt, i) {
+    if (i == 0)
+        return;
+
+    ctxt.lineRight();
+    ctxt.lineUp();
+}
+
+function W3(ctxt, i) {
+    if (i == 0)
+        return;
+
+    ctxt.lineLeft();
+    ctxt.lineDown();
+}
+
+function W4(ctxt, i) {
+    if (i == 0)
+        return;
+
+    ctxt.lineUp();
+    ctxt.lineLeft();
+}
+
+function A(ctxt, i) {
+    if (i == 0)
+        return;
+
+    A(ctxt, i - 1);
+    W1(ctxt, i - 1);
+    B(ctxt, i - 1);
+    ctxt.lineRight();
+    D(ctxt, i - 1);
+    W2(ctxt, i - 1);
+    A(ctxt, i - 1);
+}
+
+function B(ctxt, i) {
+    if (i == 0)
+        return;
+
+    B(ctxt, i - 1);
+    W3(ctxt, i - 1);
+    C(ctxt, i - 1);
+    ctxt.lineDown();
+    A(ctxt, i - 1);
+    W1(ctxt, i - 1);
+    B(ctxt, i - 1);
+}
+
+function C(ctxt, i) {
+    if (i == 0)
+        return;
+
+    C(ctxt, i - 1);
+    W4(ctxt, i - 1);
+    D(ctxt, i - 1);
+    ctxt.lineLeft();
+    B(ctxt, i - 1);
+    W3(ctxt, i - 1);
+    C(ctxt, i - 1);
+}
+
+function D(ctxt, i) {
+    if (i == 0)
+        return;
+
+    D(ctxt, i - 1);
+    W2(ctxt, i - 1);
+    A(ctxt, i - 1);
+    ctxt.lineUp();
+    C(ctxt, i - 1);
+    W4(ctxt, i - 1);
+    D(ctxt, i - 1);
+}
+
+function draw() {
+    var e = document.getElementById("S");
+    var c = e.getContext("2d");
+
+    c.strokeStyle = "darkGrey";
+    c.strokeRect(0, 0, e.width, e.height);
+    c.strokeStyle = "black";
+
+    var p = 2;
+    for (var i = 1; i < 6; ++i) {
+        var u = e.height / (2 * p);
+        var x = e.width / p - (i * u) / p;
+        var y = e.height / (2 * p) - (i * u) / p;
+
+        c.beginPath();
+        var ctxt = new Ctxt(c, x, y, u);
+        A(ctxt, i);
+        ctxt.lineDown(); ctxt.lineRight();
+        B(ctxt, i);
+        ctxt.lineLeft(); ctxt.lineDown();
+        C(ctxt, i);
+        ctxt.lineUp(); ctxt.lineLeft();
+        D(ctxt, i);
+        ctxt.lineRight(); ctxt.lineUp();
+        c.closePath();
+
+        u = u / 2;
+        p = 2 * p;
+    }
+}
+</script>
+
+<body onload="draw()">
+    <canvas id="S" width="1024" height="1024"></canvas>
+</body>
+</html>

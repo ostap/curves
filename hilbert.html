@@ -1,0 +1,106 @@
+<html>
+<head><title>Hilbert Curves</title></head>
+<script type="text/javascript">
+function Ctxt(canvas, x, y, unit) {
+    this.x = x;
+    this.y = y;
+    this.c = canvas;
+    this.c.moveTo(x, y);
+    this.u = unit;
+
+    this.lineUp = function() {
+        this.y = this.y - this.u;
+        this.draw();
+    }
+
+    this.lineRight = function() {
+        this.x = this.x + this.u;
+        this.draw();
+    }
+
+    this.lineDown = function() {
+        this.y = this.y + this.u;
+        this.draw();
+    }
+
+    this.lineLeft = function() {
+        this.x = this.x - this.u;
+        this.draw();
+    }
+
+    this.draw = function() {
+        this.c.lineTo(this.x, this.y);
+        this.c.stroke();
+    }
+}
+
+function A(ctxt, i) {
+    if (i == 0)
+        return;
+
+    D(ctxt, i - 1); ctxt.lineLeft();
+    A(ctxt, i - 1); ctxt.lineDown();
+    A(ctxt, i - 1); ctxt.lineRight();
+    B(ctxt, i - 1);
+}
+
+function B(ctxt, i) {
+    if (i == 0)
+        return;
+
+    C(ctxt, i - 1); ctxt.lineUp();
+    B(ctxt, i - 1); ctxt.lineRight();
+    B(ctxt, i - 1); ctxt.lineDown();
+    A(ctxt, i - 1);
+}
+
+function C(ctxt, i) {
+    if (i == 0)
+        return;
+
+    B(ctxt, i - 1); ctxt.lineRight();
+    C(ctxt, i - 1); ctxt.lineUp();
+    C(ctxt, i - 1); ctxt.lineLeft();
+    D(ctxt, i - 1);
+}
+
+function D(ctxt, i) {
+    if (i == 0)
+        return;
+
+    A(ctxt, i - 1); ctxt.lineDown();
+    D(ctxt, i - 1); ctxt.lineLeft();
+    D(ctxt, i - 1); ctxt.lineUp();
+    C(ctxt, i - 1);
+}
+
+function draw() {
+    var e = document.getElementById("H");
+    var c = e.getContext("2d");
+
+    c.strokeStyle = "darkGrey";
+    c.strokeRect(0, 0, e.width, e.height);
+    c.strokeStyle = "black";
+
+    var x = 0;
+    var y = e.height;
+    var u = e.height;
+
+    for (var i = 0; i < 6; i++) {
+        x = x + u / 2;
+        y = y - u / 2;
+
+        c.beginPath();
+        var ctxt = new Ctxt(c, x, y, u);
+        A(ctxt, i);
+        c.closePath();
+
+        u = u / 2;
+    }
+}
+</script>
+
+<body onload="draw()">
+    <canvas id="H" width="512" height="512"></canvas>
+</body>
+</html>
